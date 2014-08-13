@@ -17,11 +17,11 @@ import java.nio.file.Paths;
  */
 public class ProfilerTest {
 
-    private static final int ITERATIONS = 100;
+    private static final int ITERATIONS = 1000;
 
     @Test
     public void run100Times() throws IOException {
-        Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg");
+        Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg");
 
         //required to be sure JIT will not kick off all code.
         int counter = 0;

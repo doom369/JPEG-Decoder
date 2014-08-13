@@ -18,14 +18,14 @@ public class MCUBlockHolder {
     //we convert not zigzagged vals to zigzag and than draw them.
 
     //zigzagged values
-    int[][][] yComponentsZZ = new int[4][ArraysUtil.SIZE][ArraysUtil.SIZE];
-    int[][] cbComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
-    int[][] crComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
+    public int[][][] yComponentsZZ = new int[4][ArraysUtil.SIZE][ArraysUtil.SIZE];
+    public int[][] cbComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
+    public int[][] crComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
 
     //not zigzagged values
-    int[][] yComponents = new int[4][ArraysUtil.SIZE * ArraysUtil.SIZE];
-    int[] cbComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
-    int[] crComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
+    public int[][] yComponents = new int[4][ArraysUtil.SIZE * ArraysUtil.SIZE];
+    public int[] cbComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
+    public int[] crComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
 
     private int yDCPrev = 0;
     private int cbDCPrev = 0;

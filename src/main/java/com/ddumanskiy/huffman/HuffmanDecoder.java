@@ -27,7 +27,6 @@ public class HuffmanDecoder {
     private int bitCounter;
     private SOFComponent[] sofComponents;
     private SOSComponent[] sosComponents;
-    private MCUBlockHolder mcuHolder;
     private int[] block;
     private byte[] imageData;
 
@@ -40,7 +39,6 @@ public class HuffmanDecoder {
         this.sofComponents = sofComponents;
         this.sosComponents = sosComponents;
         //will be used for reusage
-        this.mcuHolder = new MCUBlockHolder();
         this.block = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
     }
 
@@ -49,15 +47,14 @@ public class HuffmanDecoder {
      * Throws IllegalStateException when end of input is reached (right now I don't see better way to do that).
      *
      */
-    public MCUBlockHolder decode() {
+    public void decode(MCUBlockHolder holder) {
         for (SOSComponent component : sosComponents) {
             SOFComponent sofComponent = sofComponents[component.getId() - 1];
             for (int i = 0; i < sofComponent.getVh(); i++) {
                 int[] mcu = decode(dcTables[component.getDcDhtTableId()], acTables[component.getAcDhtTableId()]);
-                mcuHolder.add(component.getId(), mcu, i);
+                holder.add(component.getId(), mcu, i);
             }
         }
-        return mcuHolder;
     }
 
     /**

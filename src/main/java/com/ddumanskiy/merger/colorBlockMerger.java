@@ -1,52 +1,37 @@
-package com.ddumanskiy;
+package com.ddumanskiy.merger;
 
+import com.ddumanskiy.MCUBlockHolder;
 import com.ddumanskiy.segments.SOFSegment;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-
-import static com.ddumanskiy.utils.YUVconvertorUtil.convertYUVtoRGB;
+import static com.ddumanskiy.utils.YUV.toRGB;
 
 /**
  * User: ddumanskiy
  * Date: 8/13/2014
  * Time: 9:36 AM
  */
-public class BlockMerger {
+public class ColorBlockMerger extends Merger {
 
-    private int width;
-    private int height;
     private int factorV;
     private int factorH;
-    private int componentCount;
 
     private int x;
     private int y;
     private int lastHeight;
     private int incrBlock;
 
-    private BufferedImage bi;
-    private DataBuffer image;
+    public ColorBlockMerger(int width, int height, SOFSegment sofSegment) {
+        super(width, height);
 
-    public BlockMerger( int width, int height, SOFSegment sofSegment) {
-        this.width = width;
-        this.height = height;
-        this.componentCount = sofSegment.getComponentCount();
-        if (componentCount == 1) {
-            this.factorV = 1;
-            this.factorH = 1;
-        } else {
-            this.factorH = sofSegment.getMaxH();
-            this.factorV = sofSegment.getMaxV();
-        }
-        bi  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        image = bi.getRaster().getDataBuffer();
+        this.factorH = sofSegment.getMaxH();
+        this.factorV = sofSegment.getMaxV();
     }
 
     /**
      * Put single MCU to image to correct position of byte buffer that is used in BufferedImage.
      */
-    public void mergeMCUtoEndImage(MCUBlockHolder holder) {
+    @Override
+    public void merge(MCUBlockHolder holder) {
         int mcuCounter = 0;
         while (mcuCounter < holder.yComponentsZZ.length){
             int offsetX = 0;
@@ -68,9 +53,11 @@ public class BlockMerger {
                     for (int yIndex = 0; yIndex < blockY.length; yIndex++) {
                         for (int xIndex = 0; xIndex < blockY[yIndex].length; xIndex++) {
                             if (x + xIndex < width && y + yIndex < height) {
-                                int rColor = convertYUVtoRGB(blockY[yIndex][xIndex],
-                                        componentCount == 1 ? 0 : holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
-                                        componentCount == 1 ? 0 : holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]);
+                                int rColor = toRGB(
+                                        blockY[yIndex][xIndex],
+                                        holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
+                                        holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]
+                                );
                                 image.setElem((y + yIndex) * width + x + xIndex, rColor);
                             }
                         }
@@ -94,7 +81,4 @@ public class BlockMerger {
         }
     }
 
-    public BufferedImage getBi() {
-        return bi;
-    }
 }

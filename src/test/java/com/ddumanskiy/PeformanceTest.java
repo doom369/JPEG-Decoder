@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Fork(1)
 @Warmup(iterations = 5)
-@Measurement(iterations = 10)
+@Measurement(iterations = 20)
 public class PeformanceTest {
 
     @Benchmark
@@ -33,9 +33,9 @@ public class PeformanceTest {
         BufferedImage bi = JpegDecoder.decode(testImagePath);
     }
 
-    @Benchmark
+    //@Benchmark
     public void testPerfomanceImageIO() throws IOException {
-        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg").toString());
+        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg").toString());
         BufferedImage bi = ImageIO.read(file);
     }
 

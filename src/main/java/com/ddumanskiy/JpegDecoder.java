@@ -1,6 +1,9 @@
 package com.ddumanskiy;
 
 import com.ddumanskiy.huffman.HuffmanDecoder;
+import com.ddumanskiy.merger.ColorBlockMerger;
+import com.ddumanskiy.merger.GrayBlockMerger;
+import com.ddumanskiy.merger.Merger;
 import com.ddumanskiy.segments.*;
 import com.ddumanskiy.utils.ArraysUtil;
 import com.ddumanskiy.utils.DCT;
@@ -35,11 +38,17 @@ public class JpegDecoder {
                 segmentHolder.sosSegment.getComponents()
         );
 
-        MCUBlockHolder holder;
-        BlockMerger merger = new BlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight(), segmentHolder.sofSegment);
+        MCUBlockHolder holder = new MCUBlockHolder();
+        Merger merger;
+        if (segmentHolder.sofSegment.getComponentCount() == 1) {
+            merger = new GrayBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
+        } else {
+            merger = new ColorBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight(), segmentHolder.sofSegment);
+        }
+
         try {
             while (true) {
-                holder = huffmanDecoder.decode();
+                huffmanDecoder.decode(holder);
 
                 multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
 
@@ -47,7 +56,7 @@ public class JpegDecoder {
 
                 inverseDCTAll(holder, segmentHolder.sofSegment.getComponentCount());
 
-                merger.mergeMCUtoEndImage(holder);
+                merger.merge(holder);
             }
         } catch (IllegalStateException e) {
             //end

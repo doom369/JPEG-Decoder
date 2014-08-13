@@ -1,7 +1,5 @@
 package com.ddumanskiy.huffman;
 
-import com.ddumanskiy.utils.BitUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,18 +56,12 @@ public class HuffmanTree {
         public int index;
         public int code;
 
-        //those 2 fields only for performance reasons. to avoid calculation on every block inside huffman.decode()
-        public int first4Bits;
-        public int last4Bits;
-
         protected Node() {
             this.code = -1;
         }
 
         public Node(int code) {
             this.code = code;
-            this.first4Bits = BitUtil.first4Bits(code);
-            this.last4Bits = BitUtil.last4Bits(code);
         }
 
         public boolean isFilled() {
