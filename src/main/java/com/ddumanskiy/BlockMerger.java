@@ -3,7 +3,7 @@ package com.ddumanskiy;
 import com.ddumanskiy.segments.SOFSegment;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
+import java.awt.image.DataBuffer;
 
 import static com.ddumanskiy.utils.YUVconvertorUtil.convertYUVtoRGB;
 
@@ -26,7 +26,7 @@ public class BlockMerger {
     private int incrBlock;
 
     private BufferedImage bi;
-    private WritableRaster raster;
+    private DataBuffer image;
 
     public BlockMerger( int width, int height, SOFSegment sofSegment) {
         this.width = width;
@@ -40,7 +40,7 @@ public class BlockMerger {
             this.factorV = sofSegment.getMaxV();
         }
         bi  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        raster = bi.getRaster();
+        image = bi.getRaster().getDataBuffer();
     }
 
      public void generateRGBMatrix(MCUBlockHolder holder) {
@@ -65,15 +65,10 @@ public class BlockMerger {
                     for (int yIndex = 0; yIndex < blockY.length; yIndex++) {
                         for (int xIndex = 0; xIndex < blockY[yIndex].length; xIndex++) {
                             if (x + xIndex < width && y + yIndex < height) {
-
-                                //int cIndex = (mcuCounter / 4);
                                 int rColor = convertYUVtoRGB(blockY[yIndex][xIndex],
                                         componentCount == 1 ? 0 : holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
                                         componentCount == 1 ? 0 : holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]);
-                                //bi.setRGB(x + xIndex, y + yIndex, rColor);
-                                //pixel[0] = rColor;
-                                //raster.setDataElements(x + xIndex, y + yIndex, pixel);
-                                raster.getDataBuffer().setElem((y + yIndex) * width + x + xIndex, rColor);
+                                image.setElem((y + yIndex) * width + x + xIndex, rColor);
                             }
                         }
                     }
