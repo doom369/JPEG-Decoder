@@ -45,7 +45,8 @@ public class DCT {
 
                 //todo here is point for improvement. don't know how critical it is for quality. visually - no difference
                 //input[i][j] = (int) temp1;
-                input[i][j] = (int) Math.round(temp1);
+                //input[i][j] = (int) Math.round(temp1);
+                input[i][j] = (int) (temp1 + 0.5f);
 
             }
         }
