@@ -7,7 +7,7 @@ package com.ddumanskiy.utils;
  */
 public class BitUtil {
 
-    public static int bitSetToInt(byte[] bits, int from, int count) {
+    public static int bitArrayToInt(byte[] bits, int from, int count) {
         int value = 0;
         int diff = count - 1;
         for (int i = 0; i < count; i++) {

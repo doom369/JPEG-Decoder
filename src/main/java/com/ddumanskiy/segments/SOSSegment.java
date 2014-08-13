@@ -1,8 +1,8 @@
 package com.ddumanskiy.segments;
 
 import com.ddumanskiy.utils.BitUtil;
+import com.ddumanskiy.utils.ByteArrayWrapper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class SOSSegment {
 
     private SOSComponent[] components;
 
-    private byte[] imageData;
+    private ByteArrayWrapper imageData;
 
     public static SOSSegment decode(ByteBuffer bb) throws IOException {
         ByteBuffer sosData = readSizeAndDataAndWrap(bb);
@@ -34,13 +34,13 @@ public class SOSSegment {
             sosComponents[i] = new SOSComponent(id, BitUtil.first4Bits(acdc), BitUtil.last4Bits(acdc));
         }
 
-        byte[] imageData = SOSSegment.readImageData(bb);
+        ByteArrayWrapper imageData = SOSSegment.readImageData(bb);
 
         return new SOSSegment(imageData, sosComponents);
     }
 
-    public static byte[] readImageData(ByteBuffer bb) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream(bb.remaining());
+    public static ByteArrayWrapper readImageData(ByteBuffer bb) {
+        ByteArrayWrapper bytes = new ByteArrayWrapper(bb.remaining());
         while (bb.hasRemaining()) {
             int b = Byte.toUnsignedInt(bb.get());
             if (b == 0xff) {
@@ -60,10 +60,10 @@ public class SOSSegment {
             }
         }
 
-        return bytes.toByteArray();
+        return bytes;
     }
 
-    public SOSSegment(byte[] imageData, SOSComponent... components) {
+    public SOSSegment(ByteArrayWrapper imageData, SOSComponent... components) {
         this.imageData = imageData;
         this.components = components;
     }
@@ -72,7 +72,7 @@ public class SOSSegment {
         return components;
     }
 
-    public byte[] getImageData() {
+    public ByteArrayWrapper getImageData() {
         return imageData;
     }
 

@@ -5,6 +5,7 @@ import com.ddumanskiy.MCUBlockHolder;
 import com.ddumanskiy.segments.SOFComponent;
 import com.ddumanskiy.segments.SOSComponent;
 import com.ddumanskiy.utils.ArraysUtil;
+import com.ddumanskiy.utils.ByteArrayWrapper;
 
 import java.util.Arrays;
 
@@ -27,9 +28,9 @@ public class HuffmanDecoder {
     private int[] block;
     private byte[] imageData;
 
-    public HuffmanDecoder(byte[] imageData, HuffmanTree[] dcTables, HuffmanTree[] acTables, SOFComponent[] sofComponents, SOSComponent[] sosComponents) {
-        this.imageData = imageData;
-        this.length = imageData.length * 8 - 1;
+    public HuffmanDecoder(ByteArrayWrapper imageData, HuffmanTree[] dcTables, HuffmanTree[] acTables, SOFComponent[] sofComponents, SOSComponent[] sosComponents) {
+        this.imageData = imageData.getBuf();
+        this.length = imageData.getLength() * 8 - 1;
         this.dcTables = dcTables;
         this.acTables = acTables;
         this.bitCounter = -1;
@@ -104,7 +105,7 @@ public class HuffmanDecoder {
     private static int decodeCode(byte[] bits, int from, int count) {
         if (count == 0) return 0;
 
-        int val = bitSetToInt(bits, from, count);
+        int val = bitArrayToInt(bits, from, count);
         if (getBit(bits, from) == 128) {
             return val;
         } else {
