@@ -9,22 +9,22 @@ import java.util.Arrays;
  */
 public class DCT {
 
-    private double[][] c;
-    private double[][] temp = new double[ArraysUtil.SIZE][ArraysUtil.SIZE];
+    private static double[][] c;
+    private static double[][] temp = new double[ArraysUtil.SIZE][ArraysUtil.SIZE];
 
-    public DCT() {
+    static  {
         c = new double[ArraysUtil.SIZE][ArraysUtil.SIZE];
         temp = new double[ArraysUtil.SIZE][ArraysUtil.SIZE];
         init(c);
     }
 
-    public void inverseDCT(int[][]... mcus) {
+    public static void inverseDCT(int[][]... mcus) {
         for (int[][] mcu : mcus) {
             inverseDCT(mcu);
         }
     }
 
-    private void inverseDCT(int[][] input) {
+    public static void inverseDCT(int[][] input) {
         double temp1;
 
         for (int i = 0; i < ArraysUtil.SIZE; i++) {

@@ -23,7 +23,6 @@ import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndData;
 public class JpegDecoder {
 
     public static BufferedImage decode(Path jpegImageFilePath) throws IOException {
-        DCT dct = new DCT();
         byte[] allBytes = Files.readAllBytes(jpegImageFilePath);
         SegmentHolder segmentHolder = readAllSegments(allBytes);
 
@@ -46,7 +45,7 @@ public class JpegDecoder {
 
                 fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
 
-                inverseDCTAll(dct, holder, segmentHolder.sofSegment.getComponentCount());
+                inverseDCTAll(holder, segmentHolder.sofSegment.getComponentCount());
 
                 merger.mergeMCUtoEndImage(holder);
             }
@@ -66,11 +65,11 @@ public class JpegDecoder {
         }
     }
 
-    private static void inverseDCTAll(DCT dct, MCUBlockHolder holder, int compNum) {
-        dct.inverseDCT(holder.yComponentsZZ);
+    private static void inverseDCTAll(MCUBlockHolder holder, int compNum) {
+        DCT.inverseDCT(holder.yComponentsZZ);
         if (compNum == 3) {
-            dct.inverseDCT(holder.cbComponentZZ);
-            dct.inverseDCT(holder.crComponentZZ);
+            DCT.inverseDCT(holder.cbComponentZZ);
+            DCT.inverseDCT(holder.crComponentZZ);
         }
     }
 
