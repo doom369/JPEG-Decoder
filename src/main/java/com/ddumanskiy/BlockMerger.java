@@ -14,22 +14,19 @@ import static com.ddumanskiy.utils.YUVconvertorUtil.convertYUVtoRGB;
  */
 public class BlockMerger {
 
-    int width;
-    int height;
-    int factorV;
-    int factorH;
-    int componentCount;
+    private int width;
+    private int height;
+    private int factorV;
+    private int factorH;
+    private int componentCount;
 
-    int x;
-    int y;
-    int lastHeight;
-    int incrBlock;
-    int mcuCounter;
-    int cx;
-    int cy;
+    private int x;
+    private int y;
+    private int lastHeight;
+    private int incrBlock;
 
-    BufferedImage bi;
-    WritableRaster raster;
+    private BufferedImage bi;
+    private WritableRaster raster;
 
     public BlockMerger( int width, int height, SOFSegment sofSegment) {
         this.width = width;
@@ -42,17 +39,16 @@ public class BlockMerger {
             this.factorH = sofSegment.getMaxH();
             this.factorV = sofSegment.getMaxV();
         }
-       bi  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-       raster = bi.getRaster();
+        bi  = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        raster = bi.getRaster();
     }
 
-    private int[] pixel = new int[1];
-    public void generateRGBMatrix(MCUBlockHolder holder) {
-        mcuCounter = 0;
+     public void generateRGBMatrix(MCUBlockHolder holder) {
+        int mcuCounter = 0;
         while (mcuCounter < holder.yComponentsZZ.length){
             int offsetX = 0;
             int offsetY = 0;
-            cy = 0;
+            int cy = 0;
 
             if (x >= width) {
                 x = 0;
@@ -61,7 +57,7 @@ public class BlockMerger {
 
             for (int factorVIndex = 0; factorVIndex < factorV; factorVIndex++) {
                 offsetX = 0;
-                cx = 0;
+                int cx = 0;
 
                 for (int factorHIndex = 0; factorHIndex < factorH; factorHIndex++) {
                     int[][] blockY = holder.yComponentsZZ[mcuCounter % 4];
@@ -75,8 +71,9 @@ public class BlockMerger {
                                         componentCount == 1 ? 0 : holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
                                         componentCount == 1 ? 0 : holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]);
                                 //bi.setRGB(x + xIndex, y + yIndex, rColor);
-                                pixel[0] = rColor;
-                                raster.setDataElements(x + xIndex, y + yIndex, pixel);
+                                //pixel[0] = rColor;
+                                //raster.setDataElements(x + xIndex, y + yIndex, pixel);
+                                raster.getDataBuffer().setElem((y + yIndex) * width + x + xIndex, rColor);
                             }
                         }
                     }
