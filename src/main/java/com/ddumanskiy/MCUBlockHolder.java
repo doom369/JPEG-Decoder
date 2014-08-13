@@ -3,6 +3,9 @@ package com.ddumanskiy;
 import com.ddumanskiy.utils.ArraysUtil;
 
 /**
+ * Class for holding single MCU unit. In case of model with 3 sof components it holds
+ * 4 Y, 1 Cr, 1 Cb matrix. All matrix 8 x 8 size.
+ *
  * User: ddumanskiy
  * Date: 8/13/2014
  * Time: 9:36 AM

@@ -7,6 +7,8 @@ import java.util.Arrays;
  * Initially I was using ByteArrayOutputStream. But it makes copy of byte array when ByteArrayOutputStream.toByteArray();
  * So this class decreases required app. footprint.
  *
+ * So in other words - buf array contains only required "working" bytes without any control pair bytes like "0xFFD9", "0xFF00"
+ *
  * User: ddumanskiy
  * Date: 8/13/2014
  * Time: 13:23 AM

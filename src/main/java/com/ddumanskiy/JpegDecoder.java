@@ -48,7 +48,7 @@ public class JpegDecoder {
 
                 inverseDCTAll(dct, holder, segmentHolder.sofSegment.getComponentCount());
 
-                merger.generateRGBMatrix(holder);
+                merger.mergeMCUtoEndImage(holder);
             }
         } catch (IllegalStateException e) {
             //end

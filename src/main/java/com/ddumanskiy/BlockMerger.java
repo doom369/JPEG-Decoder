@@ -43,7 +43,10 @@ public class BlockMerger {
         image = bi.getRaster().getDataBuffer();
     }
 
-     public void generateRGBMatrix(MCUBlockHolder holder) {
+    /**
+     * Put single MCU to image to correct position of byte buffer that is used in BufferedImage.
+     */
+    public void mergeMCUtoEndImage(MCUBlockHolder holder) {
         int mcuCounter = 0;
         while (mcuCounter < holder.yComponentsZZ.length){
             int offsetX = 0;

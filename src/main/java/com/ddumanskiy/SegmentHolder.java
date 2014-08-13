@@ -6,6 +6,8 @@ import com.ddumanskiy.segments.SOFSegment;
 import com.ddumanskiy.segments.SOSSegment;
 
 /**
+ * Just a holder for all read JPEG headers.
+ *
  * User: ddumanskiy
  * Date: 8/13/2014
  * Time: 9:36 AM
