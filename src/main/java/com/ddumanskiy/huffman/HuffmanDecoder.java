@@ -52,9 +52,9 @@ public class HuffmanDecoder {
     }
 
     private int[] decode(HuffmanTree dcTable, HuffmanTree acTable) {
-        int dc = decodeDC(dcTable);
+        Arrays.fill(block, 0);
+        block[0] = decodeDC(dcTable);
         decodeAC(acTable);
-        block[0] = dc;
         return block;
     }
 
@@ -83,7 +83,6 @@ public class HuffmanDecoder {
     }
 
     public void decodeAC(HuffmanTree acTable) {
-        Arrays.fill(block, 0);
         for (int k = 1; k < ArraysUtil.SIZE * ArraysUtil.SIZE; k++) {
             int code = findCode(acTable);
             int zerosNumber = first4Bits(code);
