@@ -15,7 +15,7 @@ import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
 public class DQTSegment {
 
     //todo seems 2 is a max?
-    private int[][][] dqtTables = new int[2][][];
+    private int[][] dqtTables = new int[2][];
 
     public static DQTTable decode(ByteBuffer bb) throws IOException {
         ByteBuffer dqtData = readSizeAndDataAndWrap(bb);
@@ -29,13 +29,16 @@ public class DQTSegment {
         }
 
 
-        byte[] dqtDataArray = new byte[dqtData.remaining()];
-        dqtData.get(dqtDataArray);
+        int[] dqtDataArray = new int[dqtData.remaining()];
+        int i = 0;
+        while (dqtData.hasRemaining()) {
+            dqtDataArray[i++] = Byte.toUnsignedInt(dqtData.get());
+        }
         //HexDump.dump(markerData, 0, System.out, 0);
         return new DQTTable(sizeOfElement, id, dqtDataArray);
     }
 
-    public int[][][] getDqtTables() {
+    public int[][] getDqtTables() {
         return dqtTables;
     }
 

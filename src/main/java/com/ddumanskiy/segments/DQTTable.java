@@ -1,7 +1,5 @@
 package com.ddumanskiy.segments;
 
-import com.ddumanskiy.utils.ArraysUtil;
-
 /**
  * User: ddumanskiy
  * Date: 8/13/2014
@@ -9,19 +7,20 @@ import com.ddumanskiy.utils.ArraysUtil;
  */
 public class DQTTable {
 
-    private int[][] data;
+    private int[] data;
     
     private int id;
-    
+
+    //todo not used right now, but should
     private int sizeOfElement;
 
-    public DQTTable(int size, int id, byte[] data) {
+    public DQTTable(int size, int id, int[] data) {
         this.sizeOfElement = size;
         this.id = id;
-        this.data = ArraysUtil.fillInZigZagOrder(data);
+        this.data = data;
     }
 
-    public int[][] getData() {
+    public int[] getData() {
         return data;
     }
 
@@ -33,16 +32,4 @@ public class DQTTable {
         return sizeOfElement;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("DQTTable : \n");
-        for (int i = 0; i < ArraysUtil.SIZE; i++) {
-            for (int j = 0; j < ArraysUtil.SIZE; j++) {
-                sb.append(Integer.toHexString(data[i][j])).append("\t");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-
-    }
 }

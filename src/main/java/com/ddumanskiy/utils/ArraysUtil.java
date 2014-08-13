@@ -20,22 +20,15 @@ public class ArraysUtil {
             35, 36, 48, 49, 57, 58, 62, 63
     };
 
-    public static void multiplyMatrix(int a[][], int b[][]) {
-        for (int i = 0; i < a.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                 a[i][j] *= b[i][j];
-            }
+    public static void multiply(int[] dqt, int[] data) {
+        for (int i = 0; i < data.length; i++) {
+            data[i] *= dqt[i];
         }
     }
 
-    public static void multiply(int[][] quantumMatrix, int[][] mcu) {
-        multiplyMatrix(mcu, quantumMatrix);
-    }
-
-
-    public static void multiply(int[][] quantumMatrix, int[][]... mcus) {
-        for (int[][] mcu : mcus) {
-            multiplyMatrix(mcu, quantumMatrix);
+    public static void multiply(int[] dqt, int[]... mcus) {
+        for (int[] mcu : mcus) {
+            multiply(dqt, mcu);
         }
     }
 
@@ -45,14 +38,4 @@ public class ArraysUtil {
         }
     }
 
-    public static int[][] fillInZigZagOrder(byte[] data) {
-        if (data.length > SIZE * SIZE) {
-            throw new IllegalStateException("Wrong DQT table size.");
-        }
-        int[][] filledTable = new int[SIZE][SIZE];
-        for (int i = 0; i < ZIGZAG.length; i++) {
-            filledTable[i / SIZE][i % SIZE] = Byte.toUnsignedInt(data[ZIGZAG[i]]);
-        }
-        return filledTable;
-    }
 }

@@ -42,9 +42,10 @@ public class JpegDecoder {
             while (true) {
                 holder = huffmanDecoder.decode();
 
-                fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
-                //todo - perform multiply before zigzag fro perf. improvement
                 multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
+
+                fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
+
                 inverseDCTAll(dct, holder, segmentHolder.sofSegment.getComponentCount());
 
                 merger.generateRGBMatrix(holder);
@@ -76,10 +77,10 @@ public class JpegDecoder {
     }
 
     private static void multiplyAll(DQTSegment dqtSegment, MCUBlockHolder holder, int compNum) {
-        multiply(dqtSegment.getDqtTables()[0], holder.yComponentsZZ);
+        multiply(dqtSegment.getDqtTables()[0], holder.yComponents);
         if (compNum == 3) {
-            multiply(dqtSegment.getDqtTables()[1], holder.cbComponentZZ);
-            multiply(dqtSegment.getDqtTables()[1], holder.crComponentZZ);
+            multiply(dqtSegment.getDqtTables()[1], holder.cbComponent);
+            multiply(dqtSegment.getDqtTables()[1], holder.crComponent);
         }
     }
 
