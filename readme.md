@@ -6,4 +6,4 @@ There few places for optimization right now.
 
 
 ## Usage
-` BufferedImage bi = JpegDecoder.decode(Paths.get(path, "testImage2.jpg"));
+`BufferedImage bi = JpegDecoder.decode(Paths.get(path, "testImage2.jpg"));`
