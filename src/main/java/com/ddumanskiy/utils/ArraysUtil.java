@@ -32,6 +32,12 @@ public class ArraysUtil {
         }
     }
 
+    public static void fillInZigZagOrder(int[][][] existing, int[][] data) {
+        for (int y = 0; y < existing.length; y++) {
+            fillInZigZagOrder(existing[y], data[y]);
+        }
+    }
+
     public static void fillInZigZagOrder(int[][] existing, int[] data) {
         for (int i = 0; i < ZIGZAG.length; i++) {
             existing[i / SIZE][i % SIZE] = data[ZIGZAG[i]];

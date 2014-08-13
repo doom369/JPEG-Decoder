@@ -59,9 +59,7 @@ public class JpegDecoder {
     }
 
     private static void fillInZigZagOrder(MCUBlockHolder holder, int compNum) {
-        for (int i = 0; i < 4; i++) {
-            ArraysUtil.fillInZigZagOrder(holder.yComponentsZZ[i], holder.yComponents[i]);
-        }
+        ArraysUtil.fillInZigZagOrder(holder.yComponentsZZ, holder.yComponents);
         if (compNum == 3) {
             ArraysUtil.fillInZigZagOrder(holder.cbComponentZZ, holder.cbComponent);
             ArraysUtil.fillInZigZagOrder(holder.crComponentZZ, holder.crComponent);
