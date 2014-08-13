@@ -2,6 +2,7 @@ package com.ddumanskiy;
 
 import com.ddumanskiy.huffman.HuffmanDecoder;
 import com.ddumanskiy.segments.*;
+import com.ddumanskiy.utils.ArraysUtil;
 import com.ddumanskiy.utils.DCT;
 
 import java.awt.image.BufferedImage;
@@ -41,6 +42,8 @@ public class JpegDecoder {
             while (true) {
                 holder = huffmanDecoder.decode();
 
+                fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
+                //todo - perform multiply before zigzag fro perf. improvement
                 multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
                 inverseDCTAll(dct, holder, segmentHolder.sofSegment.getComponentCount());
 
@@ -54,19 +57,29 @@ public class JpegDecoder {
 
     }
 
-    private static void inverseDCTAll(DCT dct, MCUBlockHolder holder, int compNum) {
-        dct.inverseDCT(holder.yComponents);
+    private static void fillInZigZagOrder(MCUBlockHolder holder, int compNum) {
+        for (int i = 0; i < 4; i++) {
+            ArraysUtil.fillInZigZagOrder(holder.yComponentsZZ[i], holder.yComponents[i]);
+        }
         if (compNum == 3) {
-            dct.inverseDCT(holder.cbComponent);
-            dct.inverseDCT(holder.crComponent);
+            ArraysUtil.fillInZigZagOrder(holder.cbComponentZZ, holder.cbComponent);
+            ArraysUtil.fillInZigZagOrder(holder.crComponentZZ, holder.crComponent);
+        }
+    }
+
+    private static void inverseDCTAll(DCT dct, MCUBlockHolder holder, int compNum) {
+        dct.inverseDCT(holder.yComponentsZZ);
+        if (compNum == 3) {
+            dct.inverseDCT(holder.cbComponentZZ);
+            dct.inverseDCT(holder.crComponentZZ);
         }
     }
 
     private static void multiplyAll(DQTSegment dqtSegment, MCUBlockHolder holder, int compNum) {
-        multiply(dqtSegment.getDqtTables()[0], holder.yComponents);
+        multiply(dqtSegment.getDqtTables()[0], holder.yComponentsZZ);
         if (compNum == 3) {
-            multiply(dqtSegment.getDqtTables()[1], holder.cbComponent);
-            multiply(dqtSegment.getDqtTables()[1], holder.crComponent);
+            multiply(dqtSegment.getDqtTables()[1], holder.cbComponentZZ);
+            multiply(dqtSegment.getDqtTables()[1], holder.crComponentZZ);
         }
     }
 

@@ -9,9 +9,20 @@ import com.ddumanskiy.utils.ArraysUtil;
  */
 public class MCUBlockHolder {
 
-    int[][][] yComponents = new int[4][ArraysUtil.SIZE][ArraysUtil.SIZE];
-    int[][] cbComponent = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
-    int[][] crComponent = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
+    //I hold here both zigzag and not zigzagged for performance reasons,
+    //so we do as much operations as we can with one dimension array
+    //(as it gives benefits from perf. point of view) and when all is done
+    //we convert not zigzagged vals to zigzag and than draw them.
+
+    //zigzagged values
+    int[][][] yComponentsZZ = new int[4][ArraysUtil.SIZE][ArraysUtil.SIZE];
+    int[][] cbComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
+    int[][] crComponentZZ = new int[ArraysUtil.SIZE][ArraysUtil.SIZE];
+
+    //not zigzagged values
+    int[][] yComponents = new int[4][ArraysUtil.SIZE * ArraysUtil.SIZE];
+    int[] cbComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
+    int[] crComponent = new int[ArraysUtil.SIZE * ArraysUtil.SIZE];
 
     private int yDCPrev = 0;
     private int cbDCPrev = 0;
@@ -20,15 +31,15 @@ public class MCUBlockHolder {
     public void add(int componentId, int[] mcu, int counter) {
         if (componentId == 1) {
             yDCPrev = incrDC(mcu, yDCPrev);
-            ArraysUtil.fillInZigZagOrder(yComponents[counter], mcu);
+            System.arraycopy(mcu, 0, yComponents[counter], 0, ArraysUtil.SIZE * ArraysUtil.SIZE);
         }
         if (componentId == 2) {
             cbDCPrev = incrDC(mcu, cbDCPrev);
-            ArraysUtil.fillInZigZagOrder(cbComponent, mcu);
+            System.arraycopy(mcu, 0, cbComponent, 0, ArraysUtil.SIZE * ArraysUtil.SIZE);
         }
         if (componentId == 3) {
             crDCPrev = incrDC(mcu,crDCPrev);
-            ArraysUtil.fillInZigZagOrder(crComponent, mcu);
+            System.arraycopy(mcu, 0, crComponent, 0, ArraysUtil.SIZE * ArraysUtil.SIZE);
         }
     }
 

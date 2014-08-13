@@ -49,7 +49,7 @@ public class BlockMerger {
     private int[] pixel = new int[1];
     public void generateRGBMatrix(MCUBlockHolder holder) {
         mcuCounter = 0;
-        while (mcuCounter < holder.yComponents.length){
+        while (mcuCounter < holder.yComponentsZZ.length){
             int offsetX = 0;
             int offsetY = 0;
             cy = 0;
@@ -64,7 +64,7 @@ public class BlockMerger {
                 cx = 0;
 
                 for (int factorHIndex = 0; factorHIndex < factorH; factorHIndex++) {
-                    int[][] blockY = holder.yComponents[mcuCounter % 4];
+                    int[][] blockY = holder.yComponentsZZ[mcuCounter % 4];
 
                     for (int yIndex = 0; yIndex < blockY.length; yIndex++) {
                         for (int xIndex = 0; xIndex < blockY[yIndex].length; xIndex++) {
@@ -72,8 +72,8 @@ public class BlockMerger {
 
                                 //int cIndex = (mcuCounter / 4);
                                 int rColor = convertYUVtoRGB(blockY[yIndex][xIndex],
-                                        componentCount == 1 ? 0 : holder.crComponent[(yIndex + cy) / 2][(xIndex + cx) / 2],
-                                        componentCount == 1 ? 0 : holder.cbComponent[(yIndex + cy) / 2][(xIndex + cx) / 2]);
+                                        componentCount == 1 ? 0 : holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
+                                        componentCount == 1 ? 0 : holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]);
                                 //bi.setRGB(x + xIndex, y + yIndex, rColor);
                                 pixel[0] = rColor;
                                 raster.setDataElements(x + xIndex, y + yIndex, pixel);
