@@ -41,17 +41,8 @@ public class JpegDecoder {
             while (true) {
                 holder = huffmanDecoder.decode();
 
-                multiply(segmentHolder.dqtSegment.getDqtTables()[0], holder.yComponents);
-                if (segmentHolder.sofSegment.getComponentCount() == 3) {
-                    multiply(segmentHolder.dqtSegment.getDqtTables()[1], holder.cbComponent);
-                    multiply(segmentHolder.dqtSegment.getDqtTables()[1], holder.crComponent);
-                }
-
-                dct.inverseDCT(holder.yComponents);
-                if (segmentHolder.sofSegment.getComponentCount() == 3) {
-                    dct.inverseDCT(holder.cbComponent);
-                    dct.inverseDCT(holder.crComponent);
-                }
+                multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
+                inverseDCTAll(dct, holder, segmentHolder.sofSegment.getComponentCount());
 
                 merger.generateRGBMatrix(holder);
             }
@@ -61,6 +52,22 @@ public class JpegDecoder {
 
         return merger.getBi();
 
+    }
+
+    private static void inverseDCTAll(DCT dct, MCUBlockHolder holder, int compNum) {
+        dct.inverseDCT(holder.yComponents);
+        if (compNum == 3) {
+            dct.inverseDCT(holder.cbComponent);
+            dct.inverseDCT(holder.crComponent);
+        }
+    }
+
+    private static void multiplyAll(DQTSegment dqtSegment, MCUBlockHolder holder, int compNum) {
+        multiply(dqtSegment.getDqtTables()[0], holder.yComponents);
+        if (compNum == 3) {
+            multiply(dqtSegment.getDqtTables()[1], holder.cbComponent);
+            multiply(dqtSegment.getDqtTables()[1], holder.crComponent);
+        }
     }
 
     /**
