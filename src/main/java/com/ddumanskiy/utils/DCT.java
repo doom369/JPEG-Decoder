@@ -1,5 +1,7 @@
 package com.ddumanskiy.utils;
 
+import java.util.Arrays;
+
 /**
  * User: ddumanskiy
  * Date: 8/13/2014
@@ -53,10 +55,9 @@ public class DCT {
     }
 
     private static void init(double[][] c) {
-        for (int i = 0; i < ArraysUtil.SIZE; i++) {
-            double nn = (double)(ArraysUtil.SIZE);
-            c[0][i]  = 1.0 / Math.sqrt(nn);
-        }
+        double nn = 1.0 / Math.sqrt((double) ArraysUtil.SIZE);
+
+        Arrays.fill(c[0], nn);
 
         for (int i = 1; i < ArraysUtil.SIZE; i++) {
             for (int j = 0; j < ArraysUtil.SIZE; j++) {
