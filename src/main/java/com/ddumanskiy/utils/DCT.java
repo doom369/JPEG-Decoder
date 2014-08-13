@@ -43,7 +43,10 @@ public class DCT {
                     temp1 += c[k][i] * temp[k][j];
                 }
 
+                //todo here is point for improvement. don't know how critical it is for quality. visually - no difference
+                //input[i][j] = (int) temp1;
                 input[i][j] = (int) Math.round(temp1);
+
             }
         }
     }
@@ -58,7 +61,7 @@ public class DCT {
             for (int j = 0; j < ArraysUtil.SIZE; j++) {
                 double jj = (double)j;
                 double ii = (double)i;
-                c[i][j]  = Math.sqrt(2.0/8.0) * Math.cos(((2.0 * jj + 1.0) * ii * Math.PI) / (2.0 * 8.0));
+                c[i][j]  = Math.sqrt(1.0 / 4.0) * Math.cos(((2.0 * jj + 1.0) * ii * Math.PI) / (16.0));
             }
         }
     }
