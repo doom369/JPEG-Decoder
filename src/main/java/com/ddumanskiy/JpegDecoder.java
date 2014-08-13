@@ -171,6 +171,9 @@ public class JpegDecoder {
                 case APPF :
                     readSizeAndData(buf);
                     break;
+                default :
+                    System.out.println("Should be never reached.");
+                    break;
             }
         }
 
