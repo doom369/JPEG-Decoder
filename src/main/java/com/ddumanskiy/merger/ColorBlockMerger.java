@@ -58,7 +58,7 @@ public class ColorBlockMerger extends Merger {
                                         holder.crComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2],
                                         holder.cbComponentZZ[(yIndex + cy) / 2][(xIndex + cx) / 2]
                                 );
-                                image.setElem((y + yIndex) * width + x + xIndex, rColor);
+                                fullBlock[(y + yIndex) * width + x + xIndex] = rColor;
                             }
                         }
                     }

@@ -9,6 +9,7 @@ import com.ddumanskiy.utils.ArraysUtil;
 import com.ddumanskiy.utils.DCT;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -62,7 +63,7 @@ public class JpegDecoder {
             //end
         }
 
-        return merger.getBi();
+        return makeImageFromRGBMatrix(merger.getFullBlock(), segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
 
     }
 
@@ -189,17 +190,13 @@ public class JpegDecoder {
         return segmentHolder;
     }
 
-    /*
-    public static BufferedImage makeImageFromRGBMatrix(int[][] rgbMatrix, int width, int height) {
+
+    public static BufferedImage makeImageFromRGBMatrix(int[] rgbMatrix, int width, int height) {
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                bi.setRGB(x, y, rgbMatrix[x][y]);
-            }
-        }
+        final int[] a = ((DataBufferInt) bi.getRaster().getDataBuffer()).getData();
+        System.arraycopy(rgbMatrix, 0, a, 0, rgbMatrix.length);
         return bi;
     }
-    */
 
 
 }

@@ -27,16 +27,28 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 20)
 public class PeformanceTest {
 
+    //@Benchmark
+    public void colorImage887x707_ImageIO() throws IOException {
+        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg").toString());
+        BufferedImage bi = ImageIO.read(file);
+    }
+
+    //@Benchmark
+    public void grayImage800x533_ImageIO() throws IOException {
+        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg").toString());
+        BufferedImage bi = ImageIO.read(file);
+    }
+
     @Benchmark
-    public void testPerformance() throws IOException {
+    public void colorImage887x707_JpegDecoder() throws IOException {
         Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg");
         BufferedImage bi = JpegDecoder.decode(testImagePath);
     }
 
-    //@Benchmark
-    public void testPerfomanceImageIO() throws IOException {
-        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg").toString());
-        BufferedImage bi = ImageIO.read(file);
+    @Benchmark
+    public void grayImage800x533_JpegDecoder() throws IOException {
+        Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg");
+        BufferedImage bi = JpegDecoder.decode(testImagePath);
     }
 
     public static void main(String[] args) throws RunnerException {

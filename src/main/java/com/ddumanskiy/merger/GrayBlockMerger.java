@@ -2,8 +2,6 @@ package com.ddumanskiy.merger;
 
 import com.ddumanskiy.MCUBlockHolder;
 
-import java.awt.image.BufferedImage;
-
 import static com.ddumanskiy.utils.YUV.toGray;
 
 /**
@@ -35,16 +33,12 @@ public class GrayBlockMerger extends Merger {
             for (int yIndex = 0; yIndex < 8; yIndex++) {
                 for (int xIndex = 0; xIndex < 8; xIndex++) {
                     if (x + xIndex < width && y + yIndex < height) {
-                         image.setElem((y + yIndex) * width + x + xIndex, toGray(blockY[yIndex][xIndex]));
+                         fullBlock[(y + yIndex) * width + x + xIndex] = toGray(blockY[yIndex][xIndex]);
                     }
                 }
             }
 
             x += 8;
         }
-    }
-
-    public BufferedImage getBi() {
-        return bi;
     }
 }

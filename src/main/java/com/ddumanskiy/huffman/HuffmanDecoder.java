@@ -32,7 +32,7 @@ public class HuffmanDecoder {
 
     public HuffmanDecoder(ByteArrayWrapper imageData, HuffmanTree[] dcTables, HuffmanTree[] acTables, SOFComponent[] sofComponents, SOSComponent[] sosComponents) {
         this.imageData = imageData.getBuf();
-        this.length = imageData.getLength() * 8 - 1;
+        this.length = imageData.getLength() * Byte.SIZE - 1;
         this.dcTables = dcTables;
         this.acTables = acTables;
         this.bitCounter = -1;
