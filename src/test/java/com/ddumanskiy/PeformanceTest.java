@@ -20,35 +20,49 @@ import java.util.concurrent.TimeUnit;
  * Date: 8/13/2014
  * Time: 9:36 AM
  */
-@BenchmarkMode(Mode.AverageTime)
+@State(Scope.Thread)
+@BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Fork(1)
 @Warmup(iterations = 5)
 @Measurement(iterations = 20)
+@CompilerControl(CompilerControl.Mode.INLINE)
 public class PeformanceTest {
 
-    //@Benchmark
-    public void colorImage887x707_ImageIO() throws IOException {
+    @Benchmark
+    public BufferedImage colorImage16x16_ImageIO() throws IOException {
+        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "google.jpg").toString());
+        return ImageIO.read(file);
+    }
+
+    @Benchmark
+    public BufferedImage colorImage887x707_ImageIO() throws IOException {
         File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg").toString());
-        BufferedImage bi = ImageIO.read(file);
+        return ImageIO.read(file);
     }
 
-    //@Benchmark
-    public void grayImage800x533_ImageIO() throws IOException {
+    @Benchmark
+    public BufferedImage grayImage800x533_ImageIO() throws IOException {
         File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg").toString());
-        BufferedImage bi = ImageIO.read(file);
+        return ImageIO.read(file);
     }
 
     @Benchmark
-    public void colorImage887x707_JpegDecoder() throws IOException {
+    public BufferedImage colorImage887x707_JpegDecoder() throws IOException {
         Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg");
-        BufferedImage bi = JpegDecoder.decode(testImagePath);
+        return JpegDecoder.decode(testImagePath);
     }
 
     @Benchmark
-    public void grayImage800x533_JpegDecoder() throws IOException {
+    public BufferedImage colorImage16x16_JpegDecoder() throws IOException {
+        Path testImagePath = Paths.get(new File("src/test/resources").getAbsolutePath(), "google.jpg");
+        return JpegDecoder.decode(testImagePath);
+    }
+
+    @Benchmark
+    public BufferedImage grayImage800x533_JpegDecoder() throws IOException {
         Path testImagePath= Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg");
-        BufferedImage bi = JpegDecoder.decode(testImagePath);
+        return JpegDecoder.decode(testImagePath);
     }
 
     public static void main(String[] args) throws RunnerException {
