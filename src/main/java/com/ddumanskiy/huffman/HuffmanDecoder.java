@@ -67,7 +67,7 @@ public class HuffmanDecoder {
     }
 
     /**
-     * Finds huffman code in huffman tree. Algorythm is pretty simple :
+     * Finds huffman code in huffman tree. Algorithm is pretty simple :
      * - Read 1 bit;
      * - go down (to left node in case read bit is 0 and to right node in case read bit is 1) through huffman tree starting from root;
      * - if current node has filled code (code > -1) we found huffman code. otherwise - repeat.
@@ -76,10 +76,7 @@ public class HuffmanDecoder {
     private int findCode(HuffmanTree table) throws IOException {
         HuffmanTree.Node start = table.root;
 
-        int counter = 0;
-        while (counter < 16) {
-            counter++;
-
+        for (int counter = 0; counter < 16; counter++) {
             int i = bitStream.nextBit();
             start = i == 1 ? start.node1 : start.node0;
 
@@ -129,14 +126,12 @@ public class HuffmanDecoder {
     private static int decodeCode(BitInputStream bits, int bitCount) throws IOException {
         if (bitCount == 0) return 0;
 
-        int firstBit = 0;
+        int firstBit = bits.nextBit();
         int val = 0;
-        for (int i = 0; i < bitCount; i++) {
-            val = (val << 1) + bits.nextBit();
-            if (i == 0) {
-                firstBit = val;
-            }
+        val = (val << 1) + firstBit;
 
+        for (int i = 1; i < bitCount; i++) {
+            val = (val << 1) + bits.nextBit();
         }
 
         if (firstBit == 1) {
