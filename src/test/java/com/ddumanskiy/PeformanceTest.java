@@ -1,5 +1,6 @@
 package com.ddumanskiy;
 
+import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -45,6 +46,13 @@ public class PeformanceTest {
     public BufferedImage grayImage800x533_ImageIO() throws IOException {
         File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "test.jpg").toString());
         return ImageIO.read(file);
+    }
+
+    @Benchmark
+    public BufferedImage colorImage887x707_Apache() throws Exception {
+        File file = new File(Paths.get(new File("src/test/resources").getAbsolutePath(), "testImage.jpg").toString());
+        org.apache.commons.imaging.formats.jpeg.decoder.JpegDecoder decoder = new org.apache.commons.imaging.formats.jpeg.decoder.JpegDecoder();
+        return decoder.decode(new ByteSourceFile(file));
     }
 
     @Benchmark

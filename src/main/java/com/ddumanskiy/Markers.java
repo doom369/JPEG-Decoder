@@ -11,61 +11,61 @@ package com.ddumanskiy;
 public final class Markers {
 
     //Start Of Image
-    public static final short SOI = (short) 0xFFD8;
+    public static final int SOI =  0xFFD8;
 
     //Start Of Frame (Baseline DCT)
-    public static final short SOF0 = (short) 0xFFC0;
+    public static final int SOF0 =  0xFFC0;
 
-    public static final short SOF1 = (short) 0xFFC1;
+    public static final int SOF1 =  0xFFC1;
 
     //Start Of Frame (Progressive DCT)
-    public static final short SOF2 = (short) 0xFFC2;
+    public static final int SOF2 =  0xFFC2;
 
     //Define Huffman Table(s)
-    public static final short DHT = (short) 0xFFC4;
+    public static final int DHT =  0xFFC4;
 
     //Define Quantization Table(s)
-    public static final short DQT = (short) 0xFFDB;
+    public static final int DQT =  0xFFDB;
 
     //Define Restart Interval
-    public static final short DRI = (short) 0xFFDD;
+    public static final int DRI =  0xFFDD;
 
     //Start Of Scan
-    public static final short SOS = (short) 0xFFDA;
+    public static final int SOS =  0xFFDA;
 
     //Restart
-    public static final short RST0 = (short) 0xFFD0;
-    public static final short RST1 = (short) 0xFFD1;
-    public static final short RST2 = (short) 0xFFD2;
-    public static final short RST3 = (short) 0xFFD3;
-    public static final short RST4 = (short) 0xFFD4;
-    public static final short RST5 = (short) 0xFFD5;
-    public static final short RST6 = (short) 0xFFD6;
-    public static final short RST7 = (short) 0xFFD7;
+    public static final int RST0 =  0xFFD0;
+    public static final int RST1 =  0xFFD1;
+    public static final int RST2 =  0xFFD2;
+    public static final int RST3 =  0xFFD3;
+    public static final int RST4 =  0xFFD4;
+    public static final int RST5 =  0xFFD5;
+    public static final int RST6 =  0xFFD6;
+    public static final int RST7 =  0xFFD7;
 
     //Application-specific
-    public static final short APP0 = (short) 0xFFE0;
-    public static final short APP1 = (short) 0xFFE1;
-    public static final short APP2 = (short) 0xFFE2;
-    public static final short APP3 = (short) 0xFFE3;
-    public static final short APP4 = (short) 0xFFE4;
-    public static final short APP5 = (short) 0xFFE5;
-    public static final short APP6 = (short) 0xFFE6;
-    public static final short APP7 = (short) 0xFFE7;
-    public static final short APP8 = (short) 0xFFE8;
-    public static final short APP9 = (short) 0xFFE9;
-    public static final short APPA = (short) 0xFFEA;
-    public static final short APPB = (short) 0xFFEB;
-    public static final short APPC = (short) 0xFFEC;
-    public static final short APPD = (short) 0xFFED;
-    public static final short APPE = (short) 0xFFEE;
-    public static final short APPF = (short) 0xFFEF;
+    public static final int APP0 =  0xFFE0;
+    public static final int APP1 =  0xFFE1;
+    public static final int APP2 =  0xFFE2;
+    public static final int APP3 =  0xFFE3;
+    public static final int APP4 =  0xFFE4;
+    public static final int APP5 =  0xFFE5;
+    public static final int APP6 =  0xFFE6;
+    public static final int APP7 =  0xFFE7;
+    public static final int APP8 =  0xFFE8;
+    public static final int APP9 =  0xFFE9;
+    public static final int APPA =  0xFFEA;
+    public static final int APPB =  0xFFEB;
+    public static final int APPC =  0xFFEC;
+    public static final int APPD =  0xFFED;
+    public static final int APPE =  0xFFEE;
+    public static final int APPF =  0xFFEF;
 
     //Comment
-    public static final short COM = (short) 0xFFFE;
+    public static final int COM =  0xFFFE;
 
     //End Of Image
-    public static final short EOI = (short) 0xFFD9;
+    public static final int EOI =  0xFFD9;
     
     
 }

@@ -1,11 +1,11 @@
 package com.ddumanskiy.segments;
 
+import com.ddumanskiy.utils.JpegInputStream;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import static com.ddumanskiy.utils.BitUtil.first4Bits;
 import static com.ddumanskiy.utils.BitUtil.last4Bits;
-import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
 
 /**
  * User: ddumanskiy
@@ -14,7 +14,7 @@ import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
  */
 public class SOFSegment {
 
-    private byte precision;
+    private int precision;
     
     private int width;
     
@@ -26,23 +26,24 @@ public class SOFSegment {
 
     private int maxH;
 
-    public static SOFSegment decode(ByteBuffer bb) throws IOException {
-        ByteBuffer sofData = readSizeAndDataAndWrap(bb);
+    public static SOFSegment decode(JpegInputStream jis) throws IOException {
+        //skip length bytes as we know how many to read
+        jis.skip(2);
 
-        byte precision = sofData.get();
-        int height = Short.toUnsignedInt(sofData.getShort());
-        int width = Short.toUnsignedInt(sofData.getShort());
-        byte componentNumber = sofData.get();
+        int precision = jis.read();
+        int height = jis.readShort();
+        int width = jis.readShort();
+        int componentNumber = jis.read();
 
         SOFComponent[] components = new SOFComponent[componentNumber];
         int maxH = 0;
         int maxV = 0;
         for (int i = 0; i < componentNumber; i++) {
-            byte id = sofData.get();
-            byte hv = sofData.get();
+            int id = jis.read();
+            int hv = jis.read();
             int h = first4Bits(hv);
             int v = last4Bits(hv);
-            byte quantumTableId = sofData.get();
+            int quantumTableId = jis.read();
             components[i] = new SOFComponent(id, h, v, quantumTableId);
             maxH = Math.max(maxH, h);
             maxV = Math.max(maxV, v);
@@ -51,7 +52,7 @@ public class SOFSegment {
         return new SOFSegment(precision, width, height, components, maxH, maxV);
     }
 
-    public SOFSegment(byte precision, int width, int height, SOFComponent[] components, int maxH, int maxV) {
+    public SOFSegment(int precision, int width, int height, SOFComponent[] components, int maxH, int maxV) {
         this.precision = precision;
         this.width = width;
         this.height = height;
@@ -66,7 +67,7 @@ public class SOFSegment {
                 + ", " + componentsToString() + "]";
     }
 
-    public byte getPrecision() {
+    public int getPrecision() {
         return precision;
     }
 

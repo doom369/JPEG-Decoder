@@ -1,13 +1,10 @@
 package com.ddumanskiy.segments;
 
 import com.ddumanskiy.utils.BitUtil;
-import com.ddumanskiy.utils.ByteArrayWrapper;
+import com.ddumanskiy.utils.JpegInputStream;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
-
-import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
 
 /**
  * User: ddumanskiy
@@ -18,62 +15,32 @@ public class SOSSegment {
 
     private SOSComponent[] components;
 
-    private ByteArrayWrapper imageData;
+    public static SOSSegment decode(JpegInputStream jis) throws IOException {
+        int size = jis.readSize();
 
-    public static SOSSegment decode(ByteBuffer bb) throws IOException {
-        ByteBuffer sosData = readSizeAndDataAndWrap(bb);
-
-        //HexDump.dump(markerData, 0, System.out, 0);
-
-        byte componentsNumber = sosData.get();
+        int componentsNumber = jis.read();
 
         SOSComponent[] sosComponents = new SOSComponent[componentsNumber];
         for (int i = 0; i < componentsNumber; i++) {
-            byte id = sosData.get();
-            byte acdc = sosData.get();
+            int id = jis.read();
+            int acdc = jis.read();
             sosComponents[i] = new SOSComponent(id, BitUtil.first4Bits(acdc), BitUtil.last4Bits(acdc));
+            size -= 2;
         }
 
-        ByteArrayWrapper imageData = SOSSegment.readImageData(bb);
+        //todo dont use right now rest of bytes, so skip
+        size = size - 1;
+        jis.skip(size);
 
-        return new SOSSegment(imageData, sosComponents);
+        return new SOSSegment(sosComponents);
     }
 
-    public static ByteArrayWrapper readImageData(ByteBuffer bb) {
-        ByteArrayWrapper bytes = new ByteArrayWrapper(bb.remaining());
-        while (bb.hasRemaining()) {
-            int b = Byte.toUnsignedInt(bb.get());
-            if (b == 0xff) {
-                int marker = Byte.toUnsignedInt(bb.get());
-                if (marker == 0x00) {
-                    bytes.write(b);
-                } else if (marker == 0xD9) {
-                    if (bb.hasRemaining()) {
-                        throw new IllegalStateException("Found end that is not end.");
-                    }
-                    break;
-                } else {
-                    throw new IllegalStateException("Something wrong.");
-                }
-            } else {
-                bytes.write(b);
-            }
-        }
-
-        return bytes;
-    }
-
-    public SOSSegment(ByteArrayWrapper imageData, SOSComponent... components) {
-        this.imageData = imageData;
+    public SOSSegment(SOSComponent... components) {
         this.components = components;
     }
 
     public SOSComponent[] getComponents() {
         return components;
-    }
-
-    public ByteArrayWrapper getImageData() {
-        return imageData;
     }
 
     @Override

@@ -1,13 +1,12 @@
 package com.ddumanskiy.segments;
 
 import com.ddumanskiy.huffman.HuffmanTree;
+import com.ddumanskiy.utils.JpegInputStream;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import static com.ddumanskiy.utils.BitUtil.first4Bits;
 import static com.ddumanskiy.utils.BitUtil.last4Bits;
-import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
 
 /**
  * User: ddumanskiy
@@ -25,26 +24,25 @@ public class DHTSegment {
     private HuffmanTree[] dcTables = new HuffmanTree[2];
     private HuffmanTree[] acTables = new HuffmanTree[2];
 
-    public static DHTTable decode(ByteBuffer bb) throws IOException {
-        ByteBuffer dhtData = readSizeAndDataAndWrap(bb);
+    public static DHTTable decode(JpegInputStream jis) throws IOException {
+        //skip length bytes as we know how many to read
+        jis.skip(2);
 
-        //HexDump.dump(markerData, 0, System.out, 0);
-
-        byte classAndId = dhtData.get();
+        int classAndId = jis.read();
         int tableClass = first4Bits(classAndId);
         int id = last4Bits(classAndId);
 
         int[] codeLengths = new int[HUFFMAN_TABLE_CODE_LENGTH_MAX];
 
         for (int i = 0; i < HUFFMAN_TABLE_CODE_LENGTH_MAX; i++) {
-            codeLengths[i] = Byte.toUnsignedInt(dhtData.get());
+            codeLengths[i] = jis.read();
         }
 
         HuffmanTree huffmanTree = new HuffmanTree();
         for (int i = 0; i < codeLengths.length; i++) {
             int codeLength = codeLengths[i];
             for (int j = 0; j < codeLength; j++) {
-                int code = Byte.toUnsignedInt(dhtData.get());
+                int code = jis.read();
                 huffmanTree.addLeaf(code);
             }
             if (i < codeLengths.length - 1) {

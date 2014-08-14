@@ -1,11 +1,11 @@
 package com.ddumanskiy.segments;
 
+import com.ddumanskiy.utils.JpegInputStream;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import static com.ddumanskiy.utils.BitUtil.first4Bits;
 import static com.ddumanskiy.utils.BitUtil.last4Bits;
-import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndDataAndWrap;
 
 /**
  * User: ddumanskiy
@@ -17,10 +17,10 @@ public class DQTSegment {
     //todo seems 2 is a max?
     private int[][] dqtTables = new int[2][];
 
-    public static DQTTable decode(ByteBuffer bb) throws IOException {
-        ByteBuffer dqtData = readSizeAndDataAndWrap(bb);
+    public static DQTTable decode(JpegInputStream jis) throws IOException {
+        int size = jis.readSize();
 
-        byte sizeAndId = dqtData.get();
+        int sizeAndId = jis.read();
         int sizeOfElement = first4Bits(sizeAndId);
         int id = last4Bits(sizeAndId);
         //for now ignore element size for simplicity. assume always 1 byte
@@ -29,10 +29,13 @@ public class DQTSegment {
         }
 
 
-        int[] dqtDataArray = new int[dqtData.remaining()];
-        int i = 0;
-        while (dqtData.hasRemaining()) {
-            dqtDataArray[i++] = Byte.toUnsignedInt(dqtData.get());
+        //because we read 1 byte already
+        size -= 1;
+
+        int[] dqtDataArray = new int[size];
+        //todo read as a batch?
+        for (int i = 0; i < size; i++) {
+            dqtDataArray[i] = jis.read();
         }
         //HexDump.dump(markerData, 0, System.out, 0);
         return new DQTTable(sizeOfElement, id, dqtDataArray);

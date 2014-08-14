@@ -5,11 +5,14 @@ import com.ddumanskiy.MCUBlockHolder;
 import com.ddumanskiy.segments.SOFComponent;
 import com.ddumanskiy.segments.SOSComponent;
 import com.ddumanskiy.utils.ArraysUtil;
-import com.ddumanskiy.utils.ByteArrayWrapper;
+import com.ddumanskiy.utils.BitInputStream;
+import com.ddumanskiy.utils.JpegInputStream;
 
+import java.io.IOException;
 import java.util.Arrays;
 
-import static com.ddumanskiy.utils.BitUtil.*;
+import static com.ddumanskiy.utils.BitUtil.first4Bits;
+import static com.ddumanskiy.utils.BitUtil.last4Bits;
 
 /**
  * Decodes input jpeg image byte array and produces minimum coded unit (MCU) per 1 HuffmanDecoder.decode() call.
@@ -21,21 +24,17 @@ import static com.ddumanskiy.utils.BitUtil.*;
  */
 public class HuffmanDecoder {
 
-    private final int length;
     private HuffmanTree[] dcTables;
     private HuffmanTree[] acTables;
-    private int bitCounter;
     private SOFComponent[] sofComponents;
     private SOSComponent[] sosComponents;
     private int[] block;
-    private byte[] imageData;
+    private BitInputStream bitStream;
 
-    public HuffmanDecoder(ByteArrayWrapper imageData, HuffmanTree[] dcTables, HuffmanTree[] acTables, SOFComponent[] sofComponents, SOSComponent[] sosComponents) {
-        this.imageData = imageData.getBuf();
-        this.length = imageData.getLength() * Byte.SIZE - 1;
+    public HuffmanDecoder(JpegInputStream jis, HuffmanTree[] dcTables, HuffmanTree[] acTables, SOFComponent[] sofComponents, SOSComponent[] sosComponents) {
+        this.bitStream = new BitInputStream(jis.getIs());
         this.dcTables = dcTables;
         this.acTables = acTables;
-        this.bitCounter = -1;
         this.sofComponents = sofComponents;
         this.sosComponents = sosComponents;
         //will be used for reusage
@@ -47,7 +46,7 @@ public class HuffmanDecoder {
      * Throws IllegalStateException when end of input is reached (right now I don't see better way to do that).
      *
      */
-    public void decode(MCUBlockHolder holder) {
+    public void decode(MCUBlockHolder holder) throws IOException {
         for (SOSComponent component : sosComponents) {
             SOFComponent sofComponent = sofComponents[component.getId() - 1];
             for (int i = 0; i < sofComponent.getVh(); i++) {
@@ -60,7 +59,7 @@ public class HuffmanDecoder {
     /**
      * Decodes single 8x8 array either Y, either Cr, either Cb.
      */
-    private int[] decode(HuffmanTree dcTable, HuffmanTree acTable) {
+    private int[] decode(HuffmanTree dcTable, HuffmanTree acTable) throws IOException {
         Arrays.fill(block, 0);
         block[0] = decodeDC(dcTable);
         decodeAC(acTable);
@@ -74,14 +73,15 @@ public class HuffmanDecoder {
      * - if current node has filled code (code > -1) we found huffman code. otherwise - repeat.
      *
      */
-    private int findCode(HuffmanTree table) {
+    private int findCode(HuffmanTree table) throws IOException {
         HuffmanTree.Node start = table.root;
 
-        while (bitCounter < length) {
-            bitCounter++;
+        int counter = 0;
+        while (counter < 16) {
+            counter++;
 
-            int i = getBit(imageData, bitCounter);
-            start = i == 128 ? start.node1 : start.node0;
+            int i = bitStream.nextBit();
+            start = i == 1 ? start.node1 : start.node0;
 
             if (start.code > -1) {
                 return start.code;
@@ -100,17 +100,15 @@ public class HuffmanDecoder {
      *    c) if code starts from 0 calculate returned value by: code - 2^length_in_bits_of_code + 1
      *
      */
-    public int decodeDC(HuffmanTree dcTable) {
+    public int decodeDC(HuffmanTree dcTable) throws IOException {
         int value = findCode(dcTable);
-        int result = decodeCode(imageData, bitCounter + 1, value);
-        bitCounter += value;
-        return result;
+        return decodeCode(bitStream, value);
     }
 
     /**
      * Decodes rest of 63 AC values
      */
-    private void decodeAC(HuffmanTree acTable) {
+    private void decodeAC(HuffmanTree acTable) throws IOException{
         for (int k = 1; k < ArraysUtil.SIZE * ArraysUtil.SIZE; k++) {
             int code = findCode(acTable);
             int zerosNumber = first4Bits(code);
@@ -118,8 +116,7 @@ public class HuffmanDecoder {
 
             if (bitCount != 0) {
                 k += zerosNumber;
-                block[k] = decodeCode(imageData, bitCounter + 1, bitCount);
-                bitCounter += bitCount;
+                block[k] = decodeCode(bitStream, bitCount);
             } else {
                 if (zerosNumber != 0x0F) {
                     return;
@@ -129,11 +126,20 @@ public class HuffmanDecoder {
         }
     }
 
-    private static int decodeCode(byte[] bits, int from, int bitCount) {
+    private static int decodeCode(BitInputStream bits, int bitCount) throws IOException {
         if (bitCount == 0) return 0;
 
-        int val = bitArrayToInt(bits, from, bitCount);
-        if (getBit(bits, from) == 128) {
+        int firstBit = 0;
+        int val = 0;
+        for (int i = 0; i < bitCount; i++) {
+            val = (val << 1) + bits.nextBit();
+            if (i == 0) {
+                firstBit = val;
+            }
+
+        }
+
+        if (firstBit == 1) {
             return val;
         } else {
             return val - (1 << bitCount) + 1;

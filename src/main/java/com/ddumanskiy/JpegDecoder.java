@@ -7,17 +7,18 @@ import com.ddumanskiy.merger.Merger;
 import com.ddumanskiy.segments.*;
 import com.ddumanskiy.utils.ArraysUtil;
 import com.ddumanskiy.utils.DCT;
+import com.ddumanskiy.utils.JpegInputStream;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.ddumanskiy.Markers.*;
 import static com.ddumanskiy.utils.ArraysUtil.multiply;
-import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndData;
+
 
 /**
  * User: ddumanskiy
@@ -27,43 +28,48 @@ import static com.ddumanskiy.utils.ByteBufferUtil.readSizeAndData;
 public class JpegDecoder {
 
     public static BufferedImage decode(Path jpegImageFilePath) throws IOException {
-        byte[] allBytes = Files.readAllBytes(jpegImageFilePath);
-        SegmentHolder segmentHolder = readAllSegments(allBytes);
+        //buffering full byte array for speedup.
+        int fileSize = (int) Files.size(jpegImageFilePath);
+
+        try (JpegInputStream jis = new JpegInputStream(new BufferedInputStream(Files.newInputStream(jpegImageFilePath), fileSize))) {
+
+            SegmentHolder segmentHolder = readAllSegments(jis);
 
 
-        HuffmanDecoder huffmanDecoder = new HuffmanDecoder(
-                segmentHolder.sosSegment.getImageData(),
-                segmentHolder.dhtSegment.getDcTables(),
-                segmentHolder.dhtSegment.getAcTables(),
-                segmentHolder.sofSegment.getComponents(),
-                segmentHolder.sosSegment.getComponents()
-        );
+            HuffmanDecoder huffmanDecoder = new HuffmanDecoder(
+                    jis,
+                    segmentHolder.dhtSegment.getDcTables(),
+                    segmentHolder.dhtSegment.getAcTables(),
+                    segmentHolder.sofSegment.getComponents(),
+                    segmentHolder.sosSegment.getComponents()
+            );
 
-        MCUBlockHolder holder = new MCUBlockHolder();
-        Merger merger;
-        if (segmentHolder.sofSegment.getComponentCount() == 1) {
-            merger = new GrayBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
-        } else {
-            merger = new ColorBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight(), segmentHolder.sofSegment);
-        }
-
-        try {
-            while (true) {
-                huffmanDecoder.decode(holder);
-
-                multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
-
-                fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
-
-                inverseDCTAll(holder, segmentHolder.sofSegment.getComponentCount());
-
-                merger.merge(holder);
+            MCUBlockHolder holder = new MCUBlockHolder();
+            Merger merger;
+            if (segmentHolder.sofSegment.getComponentCount() == 1) {
+                merger = new GrayBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
+            } else {
+                merger = new ColorBlockMerger(segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight(), segmentHolder.sofSegment);
             }
-        } catch (IllegalStateException e) {
-            //end
-        }
 
-        return makeImageFromRGBMatrix(merger.getFullBlock(), segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
+            try {
+                while (true) {
+                    huffmanDecoder.decode(holder);
+
+                    multiplyAll(segmentHolder.dqtSegment, holder, segmentHolder.sofSegment.getComponentCount());
+
+                    fillInZigZagOrder(holder, segmentHolder.sofSegment.getComponentCount());
+
+                    inverseDCTAll(holder, segmentHolder.sofSegment.getComponentCount());
+
+                    merger.merge(holder);
+                }
+            } catch (IllegalStateException e) {
+                //end
+            }
+
+            return makeImageFromRGBMatrix(merger.getFullBlock(), segmentHolder.sofSegment.getWidth(), segmentHolder.sofSegment.getHeight());
+        }
 
     }
 
@@ -94,16 +100,15 @@ public class JpegDecoder {
     /**
      * Read all segments from a file and creates appropriate objects.
      *
-     * @param allBytes - image file as bytes array.
+     * @param jis - image file as byte stream.
      * @throws IOException
      */
-    private static SegmentHolder readAllSegments(byte[] allBytes) throws IOException {
+    private static SegmentHolder readAllSegments(JpegInputStream jis) throws IOException {
         SegmentHolder segmentHolder = new SegmentHolder();
 
-        ByteBuffer buf = ByteBuffer.wrap(allBytes);
-
-        while (buf.hasRemaining()) {
-            short marker = buf.getShort();
+        //while we din't find real jpeg image data
+        while (segmentHolder.sosSegment == null) {
+            int marker = jis.readShort();
 
             switch (marker) {
                 case SOI :
@@ -112,40 +117,40 @@ public class JpegDecoder {
 
                 case SOF0 :
                     //System.out.println("SOF0");
-                    segmentHolder.sofSegment = SOFSegment.decode(buf);
+                    segmentHolder.sofSegment = SOFSegment.decode(jis);
                     break;
 
                 case SOF1 :
                 case SOF2 :
                     //System.out.println("SOF1");
-                    readSizeAndData(buf);
+                    jis.skip(jis.readSize());
                     break;
 
                 case DHT :
                     //System.out.println("DHT");
-                    DHTTable dhtTable = DHTSegment.decode(buf);
+                    DHTTable dhtTable = DHTSegment.decode(jis);
                     segmentHolder.dhtSegment.add(dhtTable);
                     break;
 
                 case DQT :
                     //System.out.println("DQT");
-                    DQTTable dqtTable = DQTSegment.decode(buf);
+                    DQTTable dqtTable = DQTSegment.decode(jis);
                     segmentHolder.dqtSegment.add(dqtTable);
                     break;
 
                 case DRI :
                     //System.out.println("DRI");
-                    readSizeAndData(buf);
+                    jis.skip(jis.readSize());
                     break;
 
                 case SOS :
                     //System.out.println("SOS");
-                    segmentHolder.sosSegment = SOSSegment.decode(buf);
+                    segmentHolder.sosSegment = SOSSegment.decode(jis);
                     break;
 
                case COM :
                     //System.out.println("COM");
-                    readSizeAndData(buf);
+                    jis.skip(jis.readSize());
                     break;
 
                 case EOI :
@@ -160,7 +165,7 @@ public class JpegDecoder {
                 case RST5 :
                 case RST6 :
                 case RST7 :
-                    readSizeAndData(buf);
+                    jis.skip(jis.readSize());
                     break;
 
                 case APP0 :
@@ -179,7 +184,7 @@ public class JpegDecoder {
                 case APPD :
                 case APPE :
                 case APPF :
-                    readSizeAndData(buf);
+                    jis.skip(jis.readSize());
                     break;
                 default :
                     System.out.println("Should be never reached.");
