@@ -20,11 +20,9 @@ public class YUV {
     }
 
     public static int toGray(int y) {
-        int rgb = y + 128;
+        y = y > 127 ? 255 : (y < -128 ? 0 : y + 128);
 
-        rgb = rgb > 255 ? 255 : (rgb < 0 ? 0 : rgb);
-
-        return  (0xff000000) | (rgb << 16) | (rgb << 8) | rgb;
+        return  (0xff000000) | (y << 16) | (y << 8) | y;
     }
 
 }
